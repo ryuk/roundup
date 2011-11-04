@@ -148,13 +148,15 @@ roundup_summarize() {
         p)
             ntests=$(expr $ntests + 1)
             passed=$(expr $passed + 1)
-            printf "  %-48s " "$name:"
+            width=$(expr $cols - 1 - 7 - 2)
+            printf "  %-*s " $width "$name:"
             printf "$grn[PASS]$clr\n"
             ;;
         f)
             ntests=$(expr $ntests + 1)
             failed=$(expr $failed + 1)
-            printf "  %-48s " "$name:"
+            width=$(expr $cols - 1 - 7 - 2)
+            printf "  %-*s " $width "$name:"
             printf "$red[FAIL]$clr\n"
             roundup_trace < "$roundup_tmp/$name"
             ;;
@@ -166,7 +168,7 @@ roundup_summarize() {
     # __Test Summary__
     #
     # Display the summary now that all tests are finished.
-    yes = | head -n 57 | tr -d '\n'
+    yes = | head -n $cols | tr -d '\n'
     printf "\n"
     printf "Tests:  %3d | " $ntests
     printf "Passed: %3d | " $passed
