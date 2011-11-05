@@ -144,24 +144,21 @@ roundup_summarize() {
 
     while read status name
     do
+        printed_name=$(echo $name | sed -e "s/_/ /g")
         case $status in
         p)
             ntests=$(expr $ntests + 1)
             passed=$(expr $passed + 1)
-            width=$(expr $cols - 1 - 7 - 2)
-            printf "  %-*s " $width "$name:"
-            printf "$grn[PASS]$clr\n"
+            echo "  $grn$printed_name$clr"
             ;;
         f)
             ntests=$(expr $ntests + 1)
             failed=$(expr $failed + 1)
-            width=$(expr $cols - 1 - 7 - 2)
-            printf "  %-*s " $width "$name:"
-            printf "$red[FAIL]$clr\n"
+            echo "  $red$printed_name$clr"
             roundup_trace < "$roundup_tmp/$name"
             ;;
         d)
-            printf "%s\n" "$name"
+            printf "%s\n" "$printed_name"
             ;;
         esac
     done
