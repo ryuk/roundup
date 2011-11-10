@@ -37,40 +37,66 @@ set -e
 # anyway unless you know what you're doing.
 ROUNDUP_VERSION="0.0.5"
 export ROUNDUP_VERSION
+export formatter=documention
 
 # Usage is defined in a specific comment syntax. It is `grep`ed out of this file
 # when needed (i.e. The Tomayko Method).  See
 # [shocco](http://rtomayko.heroku.com/shocco) for more detail.
-#/ usage: roundup [--help|-h] [--version|-v] [plan ...]
+#/ Usage: roundup [options] [plan]
+#/     -v, --version                    Show version
+#/     -h, --help                       You're looking at it.
+#/     -f, --format FORMATTER           Choose a formatter
+#/                                          [p]rogress
+#/                                          [t]ap
+#/                                          [d]ocumentation (default)
 
 roundup_usage() {
     grep '^#/' <"$0" | cut -c4-
 }
 
-while test "$#" -gt 0
-do
-    case "$1" in
-        --help|-h)
+
+while getopts ":hvf:c-" flag; do
+    case $flag in
+        h)
             roundup_usage
             exit 0
             ;;
-        --version|-v)
+        v)
             echo "roundup version $ROUNDUP_VERSION"
             exit 0
             ;;
-        --color)
-            color=always
-            shift
+        f)
+            case "$OPTARG" in
+                progress | p)
+                    formatter=progress
+                    ;;
+                documention | d)
+                    formatter=documention
+                    ;;
+                tap | t)
+                    formatter=tap
+                    ;;
+                *)
+                    echo "invalid argument: $OPTARG" >&2
+                    exit 1
+            esac
             ;;
-        -)
-            echo >&2 "roundup: unknown switch $1"
+        c)
+            color=always
+            ;;
+
+        \?)
+            echo "invalid option: -$OPTARG" >&2
             exit 1
             ;;
-        *)
-            break
+        :)
+            echo "option -$OPTARG requires an argument." >&2
+            exit 1
             ;;
     esac
 done
+
+shift $(( OPTIND - 1 ))
 
 # Consider all scripts with names matching `*-test.sh` the plans to run unless
 # otherwise specified as arguments.
@@ -142,26 +168,67 @@ roundup_summarize() {
 
     : ${cols:=10}
 
-    while read status name
-    do
+    while read status name; do
         printed_name=$(echo $name | sed -e "s/_/ /g")
-        case $status in
-        p)
-            ntests=$(expr $ntests + 1)
-            passed=$(expr $passed + 1)
-            echo "  $grn$printed_name$clr"
-            ;;
-        f)
-            ntests=$(expr $ntests + 1)
-            failed=$(expr $failed + 1)
-            echo "  $red$printed_name$clr"
-            roundup_trace < "$roundup_tmp/$name"
-            ;;
-        d)
-            printf "%s\n" "$printed_name"
-            ;;
-        esac
-    done
+        case $formatter in
+            progress)
+                case $status in
+                    p)
+                        let "passed = passed + 1"
+                        let "ntests = ntests + 1"
+                        printf "${grn}.${clr}"
+                        ;;
+                    f)
+                        let "failed = failed + 1"
+                        let "ntests = ntests + 1"
+                        printf "${red}F${clr}"
+
+                        echo "\n${red}$failed) Failure${clr}" >> "$roundup_tmp/fails-trace"
+                        echo "$printed_name" >> "$roundup_tmp/fails-trace"
+                        roundup_trace < "$roundup_tmp/$name" >> "$roundup_tmp/fails-trace"
+                        ;;
+                esac
+                ;;
+            documention)
+                case $status in
+                    p)
+                        let "passed = passed + 1"
+                        let "ntests = ntests + 1"
+                        echo "  $grn$printed_name$clr"
+                        ;;
+                    f)
+                        let "failed = failed + 1"
+                        let "ntests = ntests + 1"
+                        echo "  $red$printed_name$clr"
+                        roundup_trace < "$roundup_tmp/$name"
+                        ;;
+                    d)
+                        printf "%s\n" "$printed_name"
+                        ;;
+                esac
+                ;;
+            tap)
+                case $status in
+                    p)
+                        let "passed = passed + 1"
+                        let "ntests = ntests + 1"
+                        echo "ok $ntests - $printed_name"
+                        ;;
+                    f)
+                        let "failed = failed + 1"
+                        let "ntests = ntests + 1"
+                        echo "not ok $ntests - $printed_name"
+                        ;;
+                esac
+        esac # formatter
+    done # while
+
+    if [[ $formatter == progress ]]; then
+        echo
+        if [[ $failed -ne 0 ]]; then
+            cat "$roundup_tmp/fails-trace"
+        fi
+    fi
     # __Test Summary__
     #
     # Display the summary now that all tests are finished.
