@@ -98,10 +98,20 @@ done
 
 shift $(( OPTIND - 1 ))
 
+# __Colors for output__
+
+# Use colors if we are writing to a tty device.
+if (test -t 1) || (test $color = always); then
+    red=$(printf "\033[31m")
+    grn=$(printf "\033[32m")
+    mag=$(printf "\033[35m")
+    clr=$(printf "\033[m")
+    cols=$(tput cols)
+fi
+
 # Consider all scripts with names matching `*-test.sh` the plans to run unless
 # otherwise specified as arguments.
-if [ "$#" -gt "0" ]
-then
+if [ "$#" -gt "0" ]; then
     roundup_plans="$@"
 else
     roundup_plans="$(ls *-test.sh)"
@@ -147,26 +157,9 @@ roundup_trace() {
 roundup_summarize() {
     set -e
 
-    # __Colors for output__
-
-    # Use colors if we are writing to a tty device.
-    if (test -t 1) || (test $color = always)
-    then
-        red=$(printf "\033[31m")
-        grn=$(printf "\033[32m")
-        mag=$(printf "\033[35m")
-        clr=$(printf "\033[m")
-        cols=$(tput cols)
-    fi
-
-    # Make these available to `roundup_trace`.
-    export red grn mag clr
-
-    ntests=0
-    passed=0
-    failed=0
-
-    : ${cols:=10}
+    local ntests=0
+    local passed=0
+    local failed=0
 
     while read status name; do
         printed_name=$(echo $name | sed -e "s/_/ /g")
@@ -220,8 +213,8 @@ roundup_summarize() {
                         echo "not ok $ntests - $printed_name"
                         ;;
                 esac
-        esac # formatter
-    done # while
+        esac
+    done
 
     if [[ $formatter == progress ]]; then
         echo
@@ -232,15 +225,13 @@ roundup_summarize() {
     # __Test Summary__
     #
     # Display the summary now that all tests are finished.
-    yes = | head -n $cols | tr -d '\n'
-    printf "\n"
-    printf "Tests:  %3d | " $ntests
-    printf "Passed: %3d | " $passed
-    printf "Failed: %3d"    $failed
-    printf "\n"
+    eval printf '%.0s=' {1..$cols}
+    printf "\nTests:  %3d | Passed: %3d | Failed: %3d\n" $ntests $passed $failed
 
     # Exit with an error if any tests failed
-    test $failed -eq 0 || exit 2
+    if [[ $failed -gt 0 ]]; then
+        exit 2
+    fi
 }
 
 # Sandbox Test Runs
@@ -249,8 +240,7 @@ roundup_summarize() {
 # The above checks guarantee we have at least one test.  We can now move through
 # each specified test plan, determine its test plan, and administer each test
 # listed in a isolated sandbox.
-for roundup_p in $roundup_plans
-do
+for roundup_p in $roundup_plans; do
     # Create a sandbox, source the test plan, run the tests, then leave
     # without a trace.
     (
@@ -273,20 +263,14 @@ do
         before() { :; }
         after() { :; }
 
+        # We have the test plan and are in our sandbox with [roundup(5)][r5]
+        # defined.  Now we source the plan to bring its tests into scope.
+        source ./$roundup_p
+
         # Seek test methods and aggregate their names, forming a test plan.
         # This is done before populating the sandbox with tests to avoid odd
         # conflicts.
-
-        # TODO:  I want to do this with sed only.  Please send a patch if you
-        # know a cleaner way.
-        roundup_plan=$(
-            grep "^it_.*()" $roundup_p           |
-            sed "s/\(it_[a-zA-Z0-9_]*\).*$/\1/g"
-        )
-
-        # We have the test plan and are in our sandbox with [roundup(5)][r5]
-        # defined.  Now we source the plan to bring its tests into scope.
-        . ./$roundup_p
+        roundup_plan=$(declare -f | sed -n 's/\(^it_[a-zA-Z0-9_]*\).*$/\1/p')
 
         # Output the description signal
         printf "d %s" "$roundup_desc" | tr "\n" " "
@@ -328,9 +312,10 @@ do
 
                 # This is the final step of a test.  Print its pass/fail signal
                 # and name.
-                if [ "$roundup_result" -ne 0 ]
-                then printf "f"
-                else printf "p"
+                if [ "$roundup_result" -ne 0 ]; then
+                    printf "f"
+                else
+                    printf "p"
                 fi
 
                 printf " $roundup_test_name\n"
