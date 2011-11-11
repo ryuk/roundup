@@ -46,6 +46,7 @@ export formatter=documention
 #/     -v, --version                    Show version
 #/     -h, --help                       You're looking at it.
 #/     -f, --format FORMATTER           Choose a formatter
+#/                                          [b]ase
 #/                                          [p]rogress
 #/                                          [t]ap
 #/                                          [d]ocumentation (default)
@@ -75,6 +76,9 @@ while getopts ":hvf:c-" flag; do
                     ;;
                 tap | t)
                     formatter=tap
+                    ;;
+                base | b)
+                    formatter=base
                     ;;
                 *)
                     echo "invalid argument: $OPTARG" >&2
@@ -162,8 +166,28 @@ roundup_summarize() {
     local failed=0
 
     while read status name; do
-        printed_name=$(echo $name | sed -e "s/_/ /g")
+        human_name=$(echo $name | sed -e "s/_/ /g")
         case $formatter in
+            base)
+                case $status in
+                    p)
+                        let "passed = passed + 1"
+                        let "ntests = ntests + 1"
+                        printf "  %-*s " $(expr $cols - 9) "$human_name:"
+                        printf "${grn}[PASS]${clr}\n"
+                        ;;
+                    f)
+                        let "failed = failed + 1"
+                        let "ntests = ntests + 1"
+                        printf "  %-*s " $(expr $cols - 9) "$human_name:"
+                        printf "$red[FAIL]$clr\n"
+                        roundup_trace < "$roundup_tmp/$name"
+                        ;;
+                    d)
+                        printf "%s\n" "$human_name"
+                        ;;
+                esac
+                ;;
             progress)
                 case $status in
                     p)
@@ -177,7 +201,7 @@ roundup_summarize() {
                         printf "${red}F${clr}"
 
                         echo "\n${red}$failed) Failure${clr}" >> "$roundup_tmp/fails-trace"
-                        echo "$printed_name" >> "$roundup_tmp/fails-trace"
+                        echo "$human_name" >> "$roundup_tmp/fails-trace"
                         roundup_trace < "$roundup_tmp/$name" >> "$roundup_tmp/fails-trace"
                         ;;
                 esac
@@ -187,16 +211,16 @@ roundup_summarize() {
                     p)
                         let "passed = passed + 1"
                         let "ntests = ntests + 1"
-                        echo "  $grn$printed_name$clr"
+                        echo "  $grn$human_name$clr"
                         ;;
                     f)
                         let "failed = failed + 1"
                         let "ntests = ntests + 1"
-                        echo "  $red$printed_name$clr"
+                        echo "  $red$human_name$clr"
                         roundup_trace < "$roundup_tmp/$name"
                         ;;
                     d)
-                        printf "%s\n" "$printed_name"
+                        printf "%s\n" "$human_name"
                         ;;
                 esac
                 ;;
@@ -205,12 +229,12 @@ roundup_summarize() {
                     p)
                         let "passed = passed + 1"
                         let "ntests = ntests + 1"
-                        echo "ok $ntests - $printed_name"
+                        echo "ok $ntests - $human_name"
                         ;;
                     f)
                         let "failed = failed + 1"
                         let "ntests = ntests + 1"
-                        echo "not ok $ntests - $printed_name"
+                        echo "not ok $ntests - $human_name"
                         ;;
                 esac
         esac
