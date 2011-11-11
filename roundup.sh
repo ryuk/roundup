@@ -115,6 +115,7 @@ fi
 
 # Consider all scripts with names matching `*-test.sh` the plans to run unless
 # otherwise specified as arguments.
+typeset -a roundup_plans
 if [ "$#" -gt "0" ]; then
     roundup_plans="$@"
 else
@@ -161,12 +162,11 @@ roundup_trace() {
 roundup_summarize() {
     set -e
 
-    local ntests=0
-    local passed=0
-    local failed=0
+    typeset -i ntests passed failed
+    local ntests=0 passed=0 failed=0
 
     while read status name; do
-        human_name=$(echo $name | sed -e "s/_/ /g")
+        local human_name=$(echo $name | sed -e 's/_/ /g')
         case $formatter in
             base)
                 case $status in
@@ -289,19 +289,24 @@ for roundup_p in $roundup_plans; do
 
         # We have the test plan and are in our sandbox with [roundup(5)][r5]
         # defined.  Now we source the plan to bring its tests into scope.
+        if [ ! -f $roundup_p ]; then
+            echo "$roundup_p not found!" >&2
+            continue
+        fi
+
         source ./$roundup_p
 
         # Seek test methods and aggregate their names, forming a test plan.
         # This is done before populating the sandbox with tests to avoid odd
         # conflicts.
+        typeset -a roundup_plan
         roundup_plan=$(declare -f | sed -n 's/\(^it_[a-zA-Z0-9_]*\).*$/\1/p')
 
         # Output the description signal
         printf "d %s" "$roundup_desc" | tr "\n" " "
         printf "\n"
 
-        for roundup_test_name in $roundup_plan
-        do
+        for roundup_test_name in $roundup_plan; do
             # Any number of things are possible in `before`, `after`, and the
             # test.  Drop into an subshell to contain operations that may throw
             # off roundup; such as `cd`.
