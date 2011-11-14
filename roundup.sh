@@ -164,6 +164,7 @@ roundup_summarize() {
     ntests=0
     passed=0
     failed=0
+    stack_trace=""
 
     while read return_code name; do
         human_name=$(echo $name | sed -e 's/_/ /g')
@@ -173,14 +174,16 @@ roundup_summarize() {
                     p)
                         passed=$((passed + 1))
                         ntests=$((ntests + 1))
-                        printf "  %-*s " $(expr $cols - 9) "$human_name:"
+                        width=$((cols - 9))
+                        printf "  %-*s " "$width" "$human_name"
                         printf "${grn}[PASS]${clr}\n"
                         ;;
                     f)
                         failed=$((failed + 1))
                         ntests=$((ntests + 1))
-                        printf "  %-*s " $(expr $cols - 9) "$human_name:"
-                        printf "$red[FAIL]$clr\n"
+                        width=$((cols - 9))
+                        printf "  %-*s " "$width" "$human_name"
+                        printf "${red}[FAIL]${clr}\n"
                         roundup_trace < "$roundup_tmp/$name"
                         ;;
                     d)
@@ -199,11 +202,7 @@ roundup_summarize() {
                         failed=$((failed + 1))
                         ntests=$((ntests + 1))
                         printf "${red}F${clr}"
-
-                        echo >> "$roundup_tmp/fails-trace"
-                        echo "${red}${failed}) Failure${clr}" >> "$roundup_tmp/fails-trace"
-                        echo "$human_name" >> "$roundup_tmp/fails-trace"
-                        roundup_trace < "$roundup_tmp/$name" >> "$roundup_tmp/fails-trace"
+                        stack_trace="$stack_trace $name"
                         ;;
                 esac
                 ;;
@@ -244,7 +243,14 @@ roundup_summarize() {
     if [ "$formatter" = "progress" ]; then
         echo
         if [ $failed -ne 0 ]; then
-            cat "$roundup_tmp/fails-trace"
+            i=0
+            for name in $(echo $stack_trace); do
+                echo ""
+                echo "${red}${i}) Failure${clr}"
+                echo "$name"
+                roundup_trace < "$roundup_tmp/$name"
+                i=$((i + 1))
+            done
         fi
     fi
     # __Test Summary__
@@ -267,7 +273,7 @@ roundup_summarize() {
 # The above checks guarantee we have at least one test.  We can now move through
 # each specified test plan, determine its test plan, and administer each test
 # listed in a isolated sandbox.
-for roundup_p in $roundup_plans; do
+for roundup_p in $(echo $roundup_plans); do
     # Create a sandbox, source the test plan, run the tests, then leave
     # without a trace.
     (
@@ -309,7 +315,7 @@ for roundup_p in $roundup_plans; do
         printf "d %s" "$roundup_desc" | tr "\n" " "
         printf "\n"
 
-        for roundup_test_name in $roundup_plan; do
+        for roundup_test_name in $(echo $roundup_plan); do
             # Any number of things are possible in `before`, `after`, and the
             # test.  Drop into an subshell to contain operations that may throw
             # off roundup; such as `cd`.
