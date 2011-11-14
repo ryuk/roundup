@@ -212,12 +212,12 @@ roundup_summarize() {
                     p)
                         passed=$((passed + 1))
                         ntests=$((ntests + 1))
-                        echo "  $grn$human_name$clr"
+                        echo "  ${grn}${human_name}${clr}"
                         ;;
                     f)
                         failed=$((failed + 1))
                         ntests=$((ntests + 1))
-                        echo "  $red$human_name$clr"
+                        echo "  ${red}${human_name}${clr}"
                         roundup_trace < "$roundup_tmp/$name"
                         ;;
                     d)
