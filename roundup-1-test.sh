@@ -25,7 +25,9 @@
 # ------------
 
 # Prevent carpel tunnel
-rup() { /bin/sh $0 $1-test.sh ; }
+rup() {
+    /bin/sh roundup.sh $1-test.sh ;
+}
 
 # The Plan
 # --------
@@ -39,8 +41,8 @@ it_displays_the_title() {
 }
 
 it_exists_non_zero() {
-    status=$(set +e ; rup roundup-5 >/dev/null ; echo $?)
-    test 2 -eq $status
+    return_code=$(set +e ; rup roundup-5 >/dev/null ; echo $?)
+    test 2 -eq $return_code
 }
 
 it_survives_edge_cases() {
