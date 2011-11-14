@@ -115,11 +115,10 @@ fi
 
 # Consider all scripts with names matching `*-test.sh` the plans to run unless
 # otherwise specified as arguments.
-typeset -a roundup_plans
 if [ "$#" -gt "0" ]; then
     roundup_plans="$@"
 else
-    roundup_plans="$(ls *-test.sh)"
+    roundup_plans="$(find *-test.sh)"
 fi
 
 : ${color:="auto"}
@@ -162,23 +161,24 @@ roundup_trace() {
 roundup_summarize() {
     set -e
 
-    typeset -i ntests passed failed
-    local ntests=0 passed=0 failed=0
+    ntests=0
+    passed=0
+    failed=0
 
-    while read status name; do
-        local human_name=$(echo $name | sed -e 's/_/ /g')
+    while read return_code name; do
+        human_name=$(echo $name | sed -e 's/_/ /g')
         case $formatter in
             base)
-                case $status in
+                case $return_code in
                     p)
-                        let "passed = passed + 1"
-                        let "ntests = ntests + 1"
+                        passed=$((passed + 1))
+                        ntests=$((ntests + 1))
                         printf "  %-*s " $(expr $cols - 9) "$human_name:"
                         printf "${grn}[PASS]${clr}\n"
                         ;;
                     f)
-                        let "failed = failed + 1"
-                        let "ntests = ntests + 1"
+                        failed=$((failed + 1))
+                        ntests=$((ntests + 1))
                         printf "  %-*s " $(expr $cols - 9) "$human_name:"
                         printf "$red[FAIL]$clr\n"
                         roundup_trace < "$roundup_tmp/$name"
@@ -189,33 +189,34 @@ roundup_summarize() {
                 esac
                 ;;
             progress)
-                case $status in
+                case $return_code in
                     p)
-                        let "passed = passed + 1"
-                        let "ntests = ntests + 1"
+                        passed=$((passed + 1))
+                        ntests=$((ntests + 1))
                         printf "${grn}.${clr}"
                         ;;
                     f)
-                        let "failed = failed + 1"
-                        let "ntests = ntests + 1"
+                        failed=$((failed + 1))
+                        ntests=$((ntests + 1))
                         printf "${red}F${clr}"
 
-                        echo "\n${red}$failed) Failure${clr}" >> "$roundup_tmp/fails-trace"
+                        echo >> "$roundup_tmp/fails-trace"
+                        echo "${red}${failed}) Failure${clr}" >> "$roundup_tmp/fails-trace"
                         echo "$human_name" >> "$roundup_tmp/fails-trace"
                         roundup_trace < "$roundup_tmp/$name" >> "$roundup_tmp/fails-trace"
                         ;;
                 esac
                 ;;
             documention)
-                case $status in
+                case $return_code in
                     p)
-                        let "passed = passed + 1"
-                        let "ntests = ntests + 1"
+                        passed=$((passed + 1))
+                        ntests=$((ntests + 1))
                         echo "  $grn$human_name$clr"
                         ;;
                     f)
-                        let "failed = failed + 1"
-                        let "ntests = ntests + 1"
+                        failed=$((failed + 1))
+                        ntests=$((ntests + 1))
                         echo "  $red$human_name$clr"
                         roundup_trace < "$roundup_tmp/$name"
                         ;;
@@ -225,35 +226,37 @@ roundup_summarize() {
                 esac
                 ;;
             tap)
-                case $status in
+                case $return_code in
                     p)
-                        let "passed = passed + 1"
-                        let "ntests = ntests + 1"
+                        passed=$((passed + 1))
+                        ntests=$((ntests + 1))
                         echo "ok $ntests - $human_name"
                         ;;
                     f)
-                        let "failed = failed + 1"
-                        let "ntests = ntests + 1"
+                        failed=$((failed + 1))
+                        ntests=$((ntests + 1))
                         echo "not ok $ntests - $human_name"
                         ;;
                 esac
         esac
     done
 
-    if [[ $formatter == progress ]]; then
+    if [ "$formatter" = "progress" ]; then
         echo
-        if [[ $failed -ne 0 ]]; then
+        if [ $failed -ne 0 ]; then
             cat "$roundup_tmp/fails-trace"
         fi
     fi
     # __Test Summary__
     #
     # Display the summary now that all tests are finished.
-    eval printf '%.0s=' {1..$cols}
+    for _j in $(seq $cols); do
+        printf "="
+    done
     printf "\nTests:  %3d | Passed: %3d | Failed: %3d\n" $ntests $passed $failed
 
     # Exit with an error if any tests failed
-    if [[ $failed -gt 0 ]]; then
+    if [ $failed -gt 0 ]; then
         exit 2
     fi
 }
@@ -287,20 +290,20 @@ for roundup_p in $roundup_plans; do
         before() { :; }
         after() { :; }
 
-        # We have the test plan and are in our sandbox with [roundup(5)][r5]
-        # defined.  Now we source the plan to bring its tests into scope.
         if [ ! -f $roundup_p ]; then
             echo "$roundup_p not found!" >&2
             continue
         fi
 
-        source ./$roundup_p
-
         # Seek test methods and aggregate their names, forming a test plan.
         # This is done before populating the sandbox with tests to avoid odd
         # conflicts.
-        typeset -a roundup_plan
-        roundup_plan=$(declare -f | sed -n 's/\(^it_[a-zA-Z0-9_]*\).*$/\1/p')
+
+        roundup_plan=$(sed -n 's/\(^it_[a-zA-Z0-9_]*\).*$/\1/p' $roundup_p)
+
+        # We have the test plan and are in our sandbox with [roundup(5)][r5]
+        # defined.  Now we source the plan to bring its tests into scope.
+        . ./$roundup_p
 
         # Output the description signal
         printf "d %s" "$roundup_desc" | tr "\n" " "
