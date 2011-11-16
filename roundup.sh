@@ -105,7 +105,7 @@ shift $(( OPTIND - 1 ))
 # __Colors for output__
 
 # Use colors if we are writing to a tty device.
-if (test -t 1) || (test $color = always); then
+if [ -t 1 ] || [ "$color" = always ]; then
     red=$(printf "\033[31m")
     grn=$(printf "\033[32m")
     mag=$(printf "\033[35m")
@@ -256,7 +256,7 @@ roundup_summarize() {
     # __Test Summary__
     #
     # Display the summary now that all tests are finished.
-    for _j in $(seq $cols); do
+    for _j in $(seq "$cols"); do
         printf "="
     done
     printf "\nTests:  %3d | Passed: %3d | Failed: %3d\n" $ntests $passed $failed
