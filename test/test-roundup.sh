@@ -4,7 +4,7 @@
 
 roundup=../roundup.sh
 
-fp="$progress_output"
+# progress
 it_should_work_in_sh_with_progress_formatter() {
     assertion "$fp" "$( sh $roundup -f progress basic-test.sh )"
 }
@@ -25,7 +25,7 @@ it_should_work_in_zsh_with_progress_formatter() {
     assertion "$fp" "$( zsh $roundup -f p basic-test.sh )"
 }
 
-fb="$base_output"
+# base
 it_should_work_in_sh_with_base_formatter() {
     assertion "$fb" "$( sh $roundup -f base basic-test.sh )"
 }
@@ -46,7 +46,7 @@ it_should_work_in_zsh_with_base_formatter() {
     assertion "$fb" "$( zsh $roundup -f b basic-test.sh )"
 }
 
-fd="$documentation_output"
+# documentation
 it_should_work_in_sh_with_documentation_formatter() {
     assertion "$fd" "$( sh $roundup -f documention basic-test.sh )"
 }
@@ -67,7 +67,7 @@ it_should_work_in_zsh_with_documentation_formatter() {
     assertion "$fd" "$( zsh $roundup -f d basic-test.sh )"
 }
 
-ft="$tap_output"
+# tap
 it_should_work_in_sh_with_tap_formatter() {
     assertion "$ft" "$( sh $roundup -f tap basic-test.sh )"
 }
