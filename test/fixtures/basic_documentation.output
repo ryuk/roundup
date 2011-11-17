@@ -1,0 +1,14 @@
+basic tests
+  it passes
+  it fails
+    + false
+  it runs before
+  it runs after a test passes part 1
+  it runs after a test passes part 2
+  it runs after if a test fails part 1
+    + touch foo.txt
+    + test -f foo.txt
+    + false
+  it runs after if a test fails part 2
+==========
+Tests:    7 | Passed:   5 | Failed:   2

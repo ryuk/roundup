@@ -140,6 +140,9 @@ roundup_trace() {
     # Trim the two left most `+` signs.  They represent the depth at which
     # roundup executed the function.  They also, are useless and confusing.
     sed 's/^++//'                              |
+    # Need for zsh.
+    # remove the name of the function
+    sed 's/it_[^>]*>//'                        |
     # Indent the output by 4 spaces to align under the test name in the
     # summary.
     sed 's/^/    /'                            |
