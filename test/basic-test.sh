@@ -23,7 +23,7 @@
 # -----------------
 
 # `describe` the plan meaningfully.
-describe "roundup(5)"
+describe "basic tests"
 
 # `before` each test, set an arbitrary variable to an arbitrary value.  A later
 # test checks the variable to know if `before` was run.
@@ -91,3 +91,4 @@ it_runs_after_if_a_test_fails_part_2() {
 xit_ignores_this() {
     false
 }
+

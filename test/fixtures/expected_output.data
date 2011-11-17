@@ -15,7 +15,7 @@ it_runs_after_if_a_test_fails_part_1
 Tests:    7 | Passed:   5 | Failed:   2"
 
 expected_output_2=\
-"roundup(5)
+"basic tests
   it passes [PASS]
   it fails  [FAIL]
     + false
@@ -31,7 +31,7 @@ expected_output_2=\
 Tests:    7 | Passed:   5 | Failed:   2"
 
 expected_output_3=\
-"roundup(5)
+"basic tests
   it passes
   it fails
     + false

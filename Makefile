@@ -29,7 +29,7 @@ all:: sup build
 
 sup:
 	echo "==========================================================="
-	head -7 < README
+	head -7 < README.markdown
 	echo "==========================================================="
 
 build: roundup
@@ -45,7 +45,7 @@ roundup: roundup.sh FORCE
 test: roundup
 	@echo This is expected to fail \`make\`.
 	@echo
-	./roundup
+	( cd test && ./test-roundup.sh )
 
 doc: $(DOCS)
 
