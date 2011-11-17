@@ -1,5 +1,5 @@
 # vim:ft=sh
-expected_output_1=\
+progress_output=\
 ".F...F.
 
 0) Failure
@@ -14,7 +14,7 @@ it_runs_after_if_a_test_fails_part_1
 ==========
 Tests:    7 | Passed:   5 | Failed:   2"
 
-expected_output_2=\
+base_output=\
 "basic tests
   it passes [PASS]
   it fails [FAIL]
@@ -30,7 +30,7 @@ expected_output_2=\
 ==========
 Tests:    7 | Passed:   5 | Failed:   2"
 
-expected_output_3=\
+documentation_output=\
 "basic tests
   it passes
   it fails
@@ -46,7 +46,7 @@ expected_output_3=\
 ==========
 Tests:    7 | Passed:   5 | Failed:   2"
 
-expected_output_4=\
+tap_output=\
 "ok 1 - it passes
 not ok 2 - it fails
 ok 3 - it runs before

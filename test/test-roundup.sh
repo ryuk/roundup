@@ -2,86 +2,88 @@
 
 . test-helper.sh
 
-# progress formater
+roundup=../roundup.sh
+
+fp="$progress_output"
 it_should_work_in_sh_with_progress_formatter() {
-    test "$(sh ../roundup.sh -f p basic-test.sh )" = "$expected_output_1"
+    assertion "$fp" "$( sh $roundup -f progress basic-test.sh )"
 }
 
 it_should_work_in_bash_with_progress_formatter() {
-    test "$( bash ../roundup.sh -f p basic-test.sh )" = "$expected_output_1"
+    assertion "$fp" "$( bash $roundup -f p basic-test.sh )"
 }
 
 it_should_work_in_ksh_with_progress_formatter() {
-    test "$( ksh ../roundup.sh -f p basic-test.sh )" = "$expected_output_1"
+    assertion "$fp" "$( ksh $roundup -f p basic-test.sh )"
 }
 
 it_should_work_in_dash_with_progress_formatter() {
-    test "$( dash ../roundup.sh -f p basic-test.sh )" = "$expected_output_1"
+    assertion "$fp" "$( dash $roundup -f p basic-test.sh )"
 }
 
 it_should_work_in_zsh_with_progress_formatter() {
-    test "$( zsh ../roundup.sh -f p basic-test.sh )" = "$expected_output_1"
+    assertion "$fp" "$( zsh $roundup -f p basic-test.sh )"
 }
 
-# base formatter
+fb="$base_output"
 it_should_work_in_sh_with_base_formatter() {
-    test "$(sh ../roundup.sh -f b basic-test.sh )" = "$expected_output_2"
+    assertion "$fb" "$( sh $roundup -f base basic-test.sh )"
 }
 
 it_should_work_in_bash_with_base_formatter() {
-    test "$( bash ../roundup.sh -f b basic-test.sh )" = "$expected_output_2"
+    assertion "$fb" "$( bash $roundup -f b basic-test.sh )"
 }
 
 it_should_work_in_ksh_with_base_formatter() {
-    test "$( ksh ../roundup.sh -f b basic-test.sh )" = "$expected_output_2"
+    assertion "$fb" "$( ksh $roundup -f b basic-test.sh )"
 }
 
 it_should_work_in_dash_with_base_formatter() {
-    test "$( dash ../roundup.sh -f b basic-test.sh )" = "$expected_output_2"
+    assertion "$fb" "$( dash $roundup -f b basic-test.sh )"
 }
 
 it_should_work_in_zsh_with_base_formatter() {
-    test "$( zsh ../roundup.sh -f b basic-test.sh )" = "$expected_output_2"
+    assertion "$fb" "$( zsh $roundup -f b basic-test.sh )"
 }
 
-# documentation
+fd="$documentation_output"
 it_should_work_in_sh_with_documentation_formatter() {
-    test "$( sh ../roundup.sh -f d basic-test.sh )" = "$expected_output_3"
+    assertion "$fd" "$( sh $roundup -f documention basic-test.sh )"
 }
 
 it_should_work_in_bash_with_documentation_formatter() {
-    test "$( bash ../roundup.sh -f d basic-test.sh )" = "$expected_output_3"
+    assertion "$fd" "$( bash $roundup -f d basic-test.sh )"
 }
 
 it_should_work_in_ksh_with_documentation_formatter() {
-    test "$( ksh ../roundup.sh -f d basic-test.sh )" = "$expected_output_3"
+    assertion "$fd" "$( ksh $roundup -f d basic-test.sh )"
 }
 
 it_should_work_in_dash_with_documentation_formatter() {
-    test "$( dash ../roundup.sh -f d basic-test.sh )" = "$expected_output_3"
+    assertion "$fd" "$( dash $roundup -f d basic-test.sh )"
 }
 
 it_should_work_in_zsh_with_documentation_formatter() {
-    test "$( zsh ../roundup.sh -f d basic-test.sh )" = "$expected_output_3"
+    assertion "$fd" "$( zsh $roundup -f d basic-test.sh )"
 }
 
-# tap
+ft="$tap_output"
 it_should_work_in_sh_with_tap_formatter() {
-    test "$( sh ../roundup.sh -f t basic-test.sh )" = "$expected_output_4"
+    assertion "$ft" "$( sh $roundup -f tap basic-test.sh )"
 }
 
 it_should_work_in_bash_with_tap_formatter() {
-    test "$( bash ../roundup.sh -f t basic-test.sh )" = "$expected_output_4"
+    assertion "$ft" "$( bash $roundup -f t basic-test.sh )"
 }
 
 it_should_work_in_ksh_with_tap_formatter() {
-    test "$( ksh ../roundup.sh -f t basic-test.sh )" = "$expected_output_4"
+    assertion "$ft" "$( ksh $roundup -f t basic-test.sh )"
 }
 
 it_should_work_in_dash_with_tap_formatter() {
-    test "$( dash ../roundup.sh -f t basic-test.sh )" = "$expected_output_4"
+    assertion "$ft" "$( dash $roundup -f t basic-test.sh )"
 }
 
 it_should_work_in_zsh_with_tap_formatter() {
-    test "$( zsh ../roundup.sh -f t basic-test.sh )" = "$expected_output_4"
+    assertion "$ft" "$( zsh $roundup -f t basic-test.sh )"
 }
