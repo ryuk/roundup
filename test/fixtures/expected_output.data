@@ -11,13 +11,13 @@ it_runs_after_if_a_test_fails_part_1
     + touch foo.txt
     + test -f foo.txt
     + false
-==
+==========
 Tests:    7 | Passed:   5 | Failed:   2"
 
 expected_output_2=\
 "basic tests
   it passes [PASS]
-  it fails  [FAIL]
+  it fails [FAIL]
     + false
   it runs before [PASS]
   it runs after a test passes part 1 [PASS]
@@ -27,7 +27,7 @@ expected_output_2=\
     + test -f foo.txt
     + false
   it runs after if a test fails part 2 [PASS]
-==
+==========
 Tests:    7 | Passed:   5 | Failed:   2"
 
 expected_output_3=\
@@ -43,7 +43,7 @@ expected_output_3=\
     + test -f foo.txt
     + false
   it runs after if a test fails part 2
-==
+==========
 Tests:    7 | Passed:   5 | Failed:   2"
 
 expected_output_4=\
@@ -54,6 +54,6 @@ ok 4 - it runs after a test passes part 1
 ok 5 - it runs after a test passes part 2
 not ok 6 - it runs after if a test fails part 1
 ok 7 - it runs after if a test fails part 2
-==
+==========
 Tests:    7 | Passed:   5 | Failed:   2"
 

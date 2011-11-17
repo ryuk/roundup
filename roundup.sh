@@ -113,6 +113,9 @@ if [ -t 1 ] || [ "$color" = always ]; then
     cols=$(tput cols)
 fi
 
+: ${cols:=10}
+: ${color:="auto"}
+
 # Consider all scripts with names matching `*-test.sh` the plans to run unless
 # otherwise specified as arguments.
 if [ "$#" -gt "0" ]; then
@@ -121,7 +124,6 @@ else
     roundup_plans="$(find *-test.sh)"
 fi
 
-: ${color:="auto"}
 
 # Create a temporary storage place for test output to be retrieved for display
 # after failing tests.
