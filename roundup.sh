@@ -113,7 +113,7 @@ if [ -t 1 ] || [ "$color" = always ]; then
     cols=$(tput cols)
 fi
 
-: ${cols:=10}
+: ${cols:=60}
 : ${color:="auto"}
 
 # Consider all scripts with names matching `*-test.sh` the plans to run unless
@@ -349,6 +349,7 @@ for roundup_p in $(echo $roundup_plans); do
 
                 # It's safe to return to normal operation.
                 set -e
+
 
                 # If `after` wasn't redefined, then this runs `:`.
                 after

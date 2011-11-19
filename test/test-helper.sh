@@ -1,7 +1,7 @@
 assertion() {
-    input="$1";shift
-    expected="$1";shift
-    test "$input" = "$expected"
+    expected="$1"; shift
+    input="$1"; shift
+    test "$expected" = "$input"
 }
 
 fp="$(cat fixtures/basic_progress.output)"

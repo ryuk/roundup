@@ -9,5 +9,5 @@ it_runs_after_if_a_test_fails_part_1
     + touch foo.txt
     + test -f foo.txt
     + false
-==========
+============================================================
 Tests:    7 | Passed:   5 | Failed:   2
