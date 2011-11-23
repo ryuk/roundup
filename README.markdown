@@ -1,4 +1,4 @@
-#roundup - kills shell eating bugs and weeds
+# roundup - kills shell eating bugs and weeds
 You probably want to check out the **[Official roundup Repository](http://github.com/bmizerany/roundup)**
 
 roundup(1) is a unit testing tool for running roundup(5) test plans which are
