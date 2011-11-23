@@ -45,7 +45,7 @@ roundup: roundup.sh FORCE
 test: roundup
 	@echo This is expected to fail \`make\`.
 	@echo
-	( cd test && ./test-roundup.sh )
+	cd test && sh ../roundup -ft test-roundup.sh
 
 doc: $(DOCS)
 

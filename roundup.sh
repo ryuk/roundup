@@ -127,10 +127,24 @@ fi
 
 # Create a temporary storage place for test output to be retrieved for display
 # after failing tests.
-roundup_tmp="$PWD/.roundup.$$"
+roundup_tmp="/tmp/roundup/.roundup.$$"
 mkdir -p $roundup_tmp
 
-trap "rm -rf \"$roundup_tmp\"" EXIT INT
+exit_hook() {
+    set +e
+    ps $$ | grep zsh > /dev/null
+
+    if [ $? -eq 0 ]; then
+        if [ "$exit_trap" -eq "1" ]; then
+            rm -rf "$roundup_tmp"
+        fi
+    else
+        rm -rf "$roundup_tmp"
+    fi
+}
+
+export exit_trap=0
+trap exit_hook EXIT INT
 
 # __Tracing failures__
 roundup_trace() {
@@ -170,7 +184,6 @@ roundup_summarize() {
     passed=0
     failed=0
     stack_trace=""
-
     while read return_code name; do
         human_name=$(echo $name | sed -e 's/_/ /g')
         case $formatter in
@@ -267,8 +280,11 @@ roundup_summarize() {
     printf "\nTests:  %3d | Passed: %3d | Failed: %3d\n" $ntests $passed $failed
 
     # Exit with an error if any tests failed
+    exit_trap=1
     if [ $failed -gt 0 ]; then
         exit 2
+    else
+        exit 0
     fi
 }
 
