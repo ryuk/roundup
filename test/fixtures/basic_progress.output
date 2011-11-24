@@ -1,4 +1,7 @@
-.F...F.
+.F...F.*
+
+0) Pending
+    xit_ignores_this
 
 0) Failure
 it_fails
@@ -10,4 +13,4 @@ it_runs_after_if_a_test_fails_part_1
     + test -f foo.txt
     + false
 ============================================================
-Tests:    7 | Passed:   5 | Failed:   2
+Tests:    8 | Passed:   5 | Pending:   1 | Failed:   2

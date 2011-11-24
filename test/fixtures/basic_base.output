@@ -10,5 +10,6 @@ basic tests
     + test -f foo.txt
     + false
   it runs after if a test fails part 2                [PASS]
+  xit ignores this                                    [PEND]
 ============================================================
-Tests:    7 | Passed:   5 | Failed:   2
+Tests:    8 | Passed:   5 | Pending:   1 | Failed:   2

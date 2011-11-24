@@ -6,4 +6,4 @@ ok 5 - it runs after a test passes part 2
 not ok 6 - it runs after if a test fails part 1
 ok 7 - it runs after if a test fails part 2
 ============================================================
-Tests:    7 | Passed:   5 | Failed:   2
+Tests:    8 | Passed:   5 | Pending:   1 | Failed:   2
