@@ -35,7 +35,7 @@ set -e
 
 # The current version is set during `make version`.  Do not modify this line in
 # anyway unless you know what you're doing.
-ROUNDUP_VERSION="0.0.5"
+ROUNDUP_VERSION="0.0.6"
 export ROUNDUP_VERSION
 export formatter=documention
 
@@ -125,7 +125,6 @@ else
     roundup_plans="$(find *-test.sh)"
 fi
 
-
 # Create a temporary storage place for test output to be retrieved for display
 # after failing tests.
 roundup_tmp="/tmp/roundup/.roundup.$$"
@@ -133,10 +132,9 @@ mkdir -p $roundup_tmp
 
 exit_hook() {
     set +e
-    ps $$ | grep zsh > /dev/null
 
-    if [ $? -eq 0 ]; then
-        if [ "$exit_trap" -eq "1" ]; then
+    if [ -n "${ZSH_VERSION}" ]; then
+        if [ $exit_trap -eq 1 ]; then
             rm -rf "$roundup_tmp"
         fi
     else
