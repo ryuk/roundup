@@ -1,0 +1,29 @@
+assert_equal() {
+	local expected="$1"
+	local input="$2"
+	test "$expected" = "$input"
+}
+
+assert_equal_output() {
+	local formatter="$1"
+	local shell="$2"
+
+	if [[ "$formatter" == "tap" ]]; then
+		assert_equal "$tf" "$($shell $roundup -f tap unit)"
+	elif [[ "$formatter" == "base" ]]; then
+		assert_equal "$bf" "$($shell $roundup -f base unit)"
+	elif [[ "$formatter" == "progress" ]]; then
+		assert_equal "$pf" "$($shell $roundup -f progress unit)"
+	elif [[ "$formatter" == "documentation" ]]; then
+		assert_equal "$df" "$($shell $roundup -f documentation unit)"
+	else
+		return 1
+	fi
+}
+
+roundup=../roundup.sh
+
+pf="$(cat fixtures/progress.output)"
+bf="$(cat fixtures/base.output)"
+df="$(cat fixtures/documentation.output)"
+tf="$(cat fixtures/tap.output)"

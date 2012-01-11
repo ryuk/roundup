@@ -1,43 +1,12 @@
 #!/bin/sh
-# [r5]: roundup.5.html
-# [r1t]: roundup-1-test.sh.html
-# [r5t]: roundup-5-test.sh.html
-#
-# _(c) 2010 Blake Mizerany - MIT License_
-#
-# Spray **roundup** on your shells to eliminate weeds and bugs.  If your shells
-# survive **roundup**'s deathly toxic properties, they are considered
-# roundup-ready.
-#
-# **roundup** reads shell scripts to form test plans.  Each
-# test plan is sourced into a sandbox where each test is executed.
-#
-# See [roundup-1-test.sh.html][r1t] or [roundup-5-test.sh.html][r5t] for example
-# test plans.
-#
-# __Install__
-#
-#     git clone http://github.com/bmizerany/roundup.git
-#     cd roundup
-#     make
-#     sudo make install
-#     # Alternatively, copy `roundup` wherever you like.
-#
-# __NOTE__:  Because test plans are sourced into roundup, roundup prefixes its
-# variable and function names with `roundup_` to avoid name collisions.  See
-# "Sandbox Test Runs" below for more insight.
-
-# Usage and Prerequisites
-# -----------------------
 
 # Exit if any following command exits with a non-zero status.
 set -e
 
-# The current version is set during `make version`.  Do not modify this line in
 # anyway unless you know what you're doing.
 ROUNDUP_VERSION="0.0.6"
 export ROUNDUP_VERSION
-export formatter=documention
+export formatter=documentation
 
 # Usage is defined in a specific comment syntax. It is `grep`ed out of this file
 # when needed (i.e. The Tomayko Method).  See
@@ -71,8 +40,8 @@ while getopts ":hvf:c-" flag; do
                 progress | p)
                     formatter=progress
                     ;;
-                documention | d)
-                    formatter=documention
+                documentation | d)
+                    formatter=documentation
                     ;;
                 tap | t)
                     formatter=tap
@@ -179,23 +148,21 @@ roundup_trace() {
 roundup_summarize() {
     set -e
 
-    ntests=0
-    pending=0
-    passed=0
-    failed=0
-    stack_trace=""
-    pendings_name=""
+    ntests=0 pending=0 passed=0 failed=0
+    stack_trace="" pendings_name=""
 
-    while read return_code name; do
-        human_name=$(echo $name | sed -e 's/_/ /g')
+    while read state name; do
+        # human name
+        _name=$(echo $name | sed -e 's/_/ /g')
+
         case $formatter in
             base)
-                case $return_code in
+                case $state in
                     x)
                         pending=$((pending + 1))
                         ntests=$((ntests + 1))
                         width=$((cols - 9))
-                        printf "  %-*s " "$width" "$human_name"
+                        printf "  %-*s " "$width" "$_name"
                         printf "${ylw}[PEND]${clr}\n"
                         ;;
 
@@ -203,24 +170,24 @@ roundup_summarize() {
                         passed=$((passed + 1))
                         ntests=$((ntests + 1))
                         width=$((cols - 9))
-                        printf "  %-*s " "$width" "$human_name"
+                        printf "  %-*s " "$width" "$_name"
                         printf "${grn}[PASS]${clr}\n"
                         ;;
                     f)
                         failed=$((failed + 1))
                         ntests=$((ntests + 1))
                         width=$((cols - 9))
-                        printf "  %-*s " "$width" "$human_name"
+                        printf "  %-*s " "$width" "$_name"
                         printf "${red}[FAIL]${clr}\n"
                         roundup_trace < "$roundup_tmp/$name"
                         ;;
                     d)
-                        printf "%s\n" "$human_name"
+                        printf "%s\n" "$_name"
                         ;;
                 esac
                 ;;
             progress)
-                case $return_code in
+                case $state in
                     x)
                         pending=$((pending+ 1))
                         ntests=$((ntests + 1))
@@ -240,31 +207,31 @@ roundup_summarize() {
                         ;;
                 esac
                 ;;
-            documention)
-                case $return_code in
+            documentation)
+                case $state in
                     x)
                         pending=$((pending + 1))
                         ntests=$((ntests + 1))
-                        echo "  ${ylw}${human_name}${clr}"
+                        echo "  ${ylw}${_name}${clr}"
                         ;;
                     p)
                         passed=$((passed + 1))
                         ntests=$((ntests + 1))
-                        echo "  ${grn}${human_name}${clr}"
+                        echo "  ${grn}${_name}${clr}"
                         ;;
                     f)
                         failed=$((failed + 1))
                         ntests=$((ntests + 1))
-                        echo "  ${red}${human_name}${clr}"
+                        echo "  ${red}${_name}${clr}"
                         roundup_trace < "$roundup_tmp/$name"
                         ;;
                     d)
-                        printf "%s\n" "$human_name"
+                        printf "%s\n" "$_name"
                         ;;
                 esac
                 ;;
             tap)
-                case $return_code in
+                case $state in
                     x)
                         ntests=$((ntests + 1))
                         pending=$((pending + 1))
@@ -272,24 +239,24 @@ roundup_summarize() {
                     p)
                         passed=$((passed + 1))
                         ntests=$((ntests + 1))
-                        echo "ok $ntests - $human_name"
+                        echo "ok $ntests - $_name"
                         ;;
                     f)
                         failed=$((failed + 1))
                         ntests=$((ntests + 1))
-                        echo "not ok $ntests - $human_name"
+                        echo "not ok $ntests - $_name"
                         ;;
                 esac
         esac
     done
 
     if [ "$formatter" = "progress" ]; then
+        i=0 j=0
         echo
 
         if [ $pending -ne 0 ]; then
-            j=0
             for name in $(echo $pendings_name); do
-                echo ""
+                echo
                 echo "${ylw}${j}) Pending${clr}"
                 echo "    ${name}"
                 j=$((j + 1))
@@ -297,7 +264,6 @@ roundup_summarize() {
         fi
 
         if [ $failed -ne 0 ]; then
-            i=0
             for name in $(echo $stack_trace); do
                 echo ""
                 echo "${red}${i}) Failure${clr}"
@@ -334,96 +300,96 @@ for roundup_p in $(echo $roundup_plans); do
     # Create a sandbox, source the test plan, run the tests, then leave
     # without a trace.
     (
-        # Consider the description to be the `basename` of the plan minus the
-        # tailing -test.sh.
-        roundup_desc=$(basename "$roundup_p" -test.sh)
+    # Consider the description to be the `basename` of the plan minus the
+    # tailing -test.sh.
+    roundup_desc=$(basename "$roundup_p" -test.sh)
 
-        # Define functions for
-        # [roundup(5)][r5]
+    # Define functions for
+    # [roundup(5)][r5]
 
-        # A custom description is recommended, but optional.  Use `describe` to
-        # set the description to something more meaningful.
-        # TODO: reimplement this.
-        describe() {
-            roundup_desc="$*"
-        }
+    # A custom description is recommended, but optional.  Use `describe` to
+    # set the description to something more meaningful.
+    # TODO: reimplement this.
+    describe() {
+        roundup_desc="$*"
+    }
 
-        # Provide default `before` and `after` functions that run only `:`, a
-        # no-op. They may or may not be redefined by the test plan.
-        before() { :; }
-        after() { :; }
+    # Provide default `before` and `after` functions that run only `:`, a
+    # no-op. They may or may not be redefined by the test plan.
+    before() { :; }
+    after() { :; }
 
-        if [ ! -f $roundup_p ]; then
-            echo "$roundup_p not found!" >&2
-            continue
-        fi
+    if [ ! -f $roundup_p ]; then
+        echo "$roundup_p not found!" >&2
+        continue
+    fi
 
-        # Seek test methods and aggregate their names, forming a test plan.
-        # This is done before populating the sandbox with tests to avoid odd
-        # conflicts.
+    # Seek test methods and aggregate their names, forming a test plan.
+    # This is done before populating the sandbox with tests to avoid odd
+    # conflicts.
 
-        roundup_plan=$(sed -n 's/\(^[x]*it_[a-zA-Z0-9_]*\).*$/\1/p' $roundup_p)
+    roundup_plan=$(sed -n 's/\(^[x]*it_[a-zA-Z0-9_]*\).*$/\1/p' $roundup_p)
 
-        # We have the test plan and are in our sandbox with [roundup(5)][r5]
-        # defined.  Now we source the plan to bring its tests into scope.
-        . ./$roundup_p
+    # We have the test plan and are in our sandbox with [roundup(5)][r5]
+    # defined.  Now we source the plan to bring its tests into scope.
+    . ./$roundup_p
 
-        # Output the description signal
-        printf "d %s" "$roundup_desc" | tr "\n" " "
-        printf "\n"
+    # Output the description signal
+    printf "d %s" "$roundup_desc" | tr "\n" " "
+    printf "\n"
 
-        for roundup_test_name in $(echo $roundup_plan); do
+    for roundup_test_name in $(echo $roundup_plan); do
+        set +e
+        echo $roundup_test_name | grep "^xit_" > /dev/null
+
+        if [ $? -eq 1 ]; then
+            # Any number of things are possible in `before`, `after`, and the
+            # test.  Drop into an subshell to contain operations that may throw
+            # off roundup; such as `cd`.
+            (
+            # If `before` wasn't redefined, then this is `:`.
+            before
+
+            # Momentarily turn off auto-fail to give us access to the tests
+            # exit status in `$?` for capturing.
             set +e
-            echo $roundup_test_name | grep "^xit_" > /dev/null
+            (
+            # Set `-xe` before the test in the subshell.  We want the
+            # test to fail fast to allow for more accurate output of
+            # where things went wrong but not in _our_ process because a
+            # failed test should not immediately fail roundup.  Each
+            # tests trace output is saved in temporary storage.
+            set -xe
+            $roundup_test_name
+            ) >"$roundup_tmp/$roundup_test_name" 2>&1
 
-            if [ $? -eq 1 ]; then
-                # Any number of things are possible in `before`, `after`, and the
-                # test.  Drop into an subshell to contain operations that may throw
-                # off roundup; such as `cd`.
-                (
-                    # If `before` wasn't redefined, then this is `:`.
-                    before
+            # We need to capture the exit status before returning the `set
+            # -e` mode.  Returning with `set -e` before we capture the exit
+            # status will result in `$?` being set with `set`'s status
+            # instead.
+            roundup_result=$?
 
-                    # Momentarily turn off auto-fail to give us access to the tests
-                    # exit status in `$?` for capturing.
-                    set +e
-                    (
-                        # Set `-xe` before the test in the subshell.  We want the
-                        # test to fail fast to allow for more accurate output of
-                        # where things went wrong but not in _our_ process because a
-                        # failed test should not immediately fail roundup.  Each
-                        # tests trace output is saved in temporary storage.
-                        set -xe
-                        $roundup_test_name
-                    ) >"$roundup_tmp/$roundup_test_name" 2>&1
-
-                    # We need to capture the exit status before returning the `set
-                    # -e` mode.  Returning with `set -e` before we capture the exit
-                    # status will result in `$?` being set with `set`'s status
-                    # instead.
-                    roundup_result=$?
-
-                    # It's safe to return to normal operation.
-                    set -e
+            # It's safe to return to normal operation.
+            set -e
 
 
-                    # If `after` wasn't redefined, then this runs `:`.
-                    after
+            # If `after` wasn't redefined, then this runs `:`.
+            after
 
-                    # This is the final step of a test.  Print its pass/fail signal
-                    # and name.
-                    if [ "$roundup_result" -ne 0 ]; then
-                        printf "f"
-                    else
-                        printf "p"
-                    fi
-
-                    printf " $roundup_test_name\n"
-                )
+            # This is the final step of a test.  Print its pass/fail signal
+            # and name.
+            if [ "$roundup_result" -ne 0 ]; then
+                printf "f"
             else
-                printf "x $roundup_test_name\n"
+                printf "p"
             fi
-        done
+
+            printf " $roundup_test_name\n"
+            )
+        else
+            printf "x $roundup_test_name\n"
+        fi
+    done
     )
 done |
 

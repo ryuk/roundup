@@ -1,71 +1,31 @@
 # roundup - kills shell eating bugs and weeds
 You probably want to check out the **[Official roundup Repository](http://github.com/bmizerany/roundup)**
 
-`roundup(1)` is a unit testing tool for running `roundup(5)` test plans which are
-written in any POSIX shell.  Each test in a plan is run in it's own isolated
-sandbox.  A test can pass, be ignored, or fail.  Failed tests output their `set -x trace`.
+# Authors
 
-## This fork has many different output formatters:
+- Blake Mizerany         <http://github.com/bmizerany>
+- Keith Rarick           <http://github.com/kr>
+- Ryan Tomayko           <http://tomayko.com/about>
 
-        $ roundup -f documention
-        basic tests
-          it passes
-          it fails
-            + false
-          it runs before
-          it runs after a test passes part 1
-          it runs after a test passes part 2
-          it runs after if a test fails part 1
-            + touch foo.txt
-            + test -f foo.txt
-            + false
-          it runs after if a test fails part 2
-          xit ignores this
-        ======================================================
-        Tests:    8 | Passed:   5 | Pending:   1 | Failed:   2
----
-        $ roundup -f base
-        basic tests
-          it passes                                      [PASS]
-          it fails                                       [FAIL]
-            + false
-          it runs before                                 [PASS]
-          it runs after a test passes part 1             [PASS]
-          it runs after a test passes part 2             [PASS]
-          it runs after if a test fails part 1           [FAIL]
-            + touch foo.txt
-            + test -f foo.txt
-            + false
-          it runs after if a test fails part 2           [PASS]
-          xit ignores this                               [PEND]
-        =======================================================
-        Tests:    8 | Passed:   5 | Pending:   1 | Failed:   2
----
-        $ roundup -f progress
-        .F...F.*
+# License
 
-        0) Pending
-            xit_ignores_this
+The MIT open-source licence.
 
-        0) Failure
-        it_fails
-            + false
+Copyright (c) 2010 Blake Mizerany <http://blakemizerany.com/about>
 
-        1) Failure
-        it_runs_after_if_a_test_fails_part_1
-            + touch foo.txt
-            + test -f foo.txt
-            + false
-        =======================================================
-        Tests:    8 | Passed:   5 | Pending:   1 | Failed:   2
----
-        $ roundup -f tap
-        ok 1 - it passes
-        not ok 2 - it fails
-        ok 3 - it runs before
-        ok 4 - it runs after a test passes part 1
-        ok 5 - it runs after a test passes part 2
-        not ok 6 - it runs after if a test fails part 1
-        ok 7 - it runs after if a test fails part 2
-        =======================================================
-        Tests:    8 | Passed:   5 | Pending:   1 | Failed:   2
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to
+deal in the Software without restriction, including without limitation the
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+sell copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
