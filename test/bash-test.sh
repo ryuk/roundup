@@ -5,17 +5,17 @@
 describe "bash"
 
 it_should_work_with_progress_formatter() {
-	assert_equal_output progress bash
+  assert_equal_output progress bash
 }
 
 it_should_work_with_base_formatter() {
-	assert_equal_output base bash
+  assert_equal_output base bash
 }
 
 it_should_work_with_documentation_formatter() {
-	assert_equal_output documentation bash
+  assert_equal_output documentation bash
 }
 
 it_should_work_with_tap_formatter() {
-	assert_equal_output tap bash
+  assert_equal_output tap bash
 }

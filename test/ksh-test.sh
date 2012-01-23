@@ -5,17 +5,17 @@
 describe "ksh"
 
 it_should_work_with_progress_formatter() {
-	assert_equal_output progress ksh
+  assert_equal_output progress ksh
 }
 
 it_should_work_with_base_formatter() {
-	assert_equal_output base ksh
+  assert_equal_output base ksh
 }
 
 it_should_work_with_documentation_formatter() {
-	assert_equal_output documentation ksh
+  assert_equal_output documentation ksh
 }
 
 it_should_work_with_tap_formatter() {
-	assert_equal_output tap ksh
+  assert_equal_output tap ksh
 }

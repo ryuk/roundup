@@ -3,10 +3,10 @@ BINDIR = /usr/local/bin
 
 test:
 	@ cd test; \
-	$(SHELL) ../roundup.sh -fb
+	$(SHELL) ../roundup -fb
 
 install:
-	cp roundup.sh $(BINDIR)/roundup
+	cp roundup $(BINDIR)/roundup
 	chmod 0755 $(BINDIR)/roundup
 
 uninstall:

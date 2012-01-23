@@ -5,17 +5,17 @@
 describe "sh"
 
 it_should_work_with_progress_formatter() {
-	assert_equal_output progress sh
+  assert_equal_output progress sh
 }
 
 it_should_work_with_base_formatter() {
-	assert_equal_output base sh
+  assert_equal_output base sh
 }
 
 it_should_work_with_documentation_formatter() {
-	assert_equal_output documentation sh
+  assert_equal_output documentation sh
 }
 
 it_should_work_with_tap_formatter() {
-	assert_equal_output tap sh
+  assert_equal_output tap sh
 }
