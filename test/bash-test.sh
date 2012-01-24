@@ -1,6 +1,6 @@
 #!/usr/bin/env roundup -fd
 
-. helpers
+source helpers
 
 describe "bash"
 

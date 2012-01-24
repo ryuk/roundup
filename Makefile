@@ -1,4 +1,4 @@
-SHELL  = sh
+SHELL  = bash
 BINDIR = /usr/local/bin
 
 test:
