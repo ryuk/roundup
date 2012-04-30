@@ -1,0 +1,7 @@
+---
+language: shell
+script: "make test"
+before_install:
+  - sudo apt-get install zsh
+  - sudo apt-get install ksh
+  - sudo apt-get install dash

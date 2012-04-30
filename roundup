@@ -4,8 +4,7 @@
 set -e
 
 # anyway unless you know what you're doing.
-ROUNDUP_VERSION="0.0.6"
-export ROUNDUP_VERSION
+export ROUNDUP_VERSION="0.0.6"
 export formatter=documentation
 
 # Usage is defined in a specific comment syntax. It is `grep`ed out of this file
